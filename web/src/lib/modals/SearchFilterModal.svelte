@@ -1,13 +1,14 @@
 <script lang="ts">
-  import SearchCameraSection from '$lib/components/shared-components/search-bar/search-camera-section.svelte';
-  import SearchDateSection from '$lib/components/shared-components/search-bar/search-date-section.svelte';
-  import SearchDisplaySection from '$lib/components/shared-components/search-bar/search-display-section.svelte';
-  import SearchLocationSection from '$lib/components/shared-components/search-bar/search-location-section.svelte';
-  import SearchMediaSection from '$lib/components/shared-components/search-bar/search-media-section.svelte';
-  import SearchPeopleSection from '$lib/components/shared-components/search-bar/search-people-section.svelte';
-  import SearchRatingsSection from '$lib/components/shared-components/search-bar/search-ratings-section.svelte';
-  import SearchTagsSection from '$lib/components/shared-components/search-bar/search-tags-section.svelte';
-  import SearchTextSection from '$lib/components/shared-components/search-bar/search-text-section.svelte';
+  import SearchAlbumsSection from '$lib/components/shared-components/search-bar/SearchAlbumsSection.svelte';
+  import SearchCameraSection from '$lib/components/shared-components/search-bar/SearchCameraSection.svelte';
+  import SearchDateSection from '$lib/components/shared-components/search-bar/SearchDateSection.svelte';
+  import SearchDisplaySection from '$lib/components/shared-components/search-bar/SearchDisplaySection.svelte';
+  import SearchLocationSection from '$lib/components/shared-components/search-bar/SearchLocationSection.svelte';
+  import SearchMediaSection from '$lib/components/shared-components/search-bar/SearchMediaSection.svelte';
+  import SearchPeopleSection from '$lib/components/shared-components/search-bar/SearchPeopleSection.svelte';
+  import SearchRatingsSection from '$lib/components/shared-components/search-bar/SearchRatingsSection.svelte';
+  import SearchTagsSection from '$lib/components/shared-components/search-bar/SearchTagsSection.svelte';
+  import SearchTextSection from '$lib/components/shared-components/search-bar/SearchTextSection.svelte';
   import { MediaType, QueryType, validQueryTypes } from '$lib/constants';
   import { preferences } from '$lib/stores/user.store';
   import type { SearchFilter } from '$lib/types';
@@ -59,6 +60,7 @@
       ocr: searchQuery.ocr,
       queryType: defaultQueryType(),
       queryAssetId: 'queryAssetId' in searchQuery ? searchQuery.queryAssetId : undefined,
+      albumIds: new SvelteSet('albumIds' in searchQuery && searchQuery.albumIds ? searchQuery.albumIds : []),
       personIds: new SvelteSet('personIds' in searchQuery ? searchQuery.personIds : []),
       tagIds:
         'tagIds' in searchQuery
@@ -102,6 +104,7 @@
       query: '',
       ocr: undefined,
       queryType: defaultQueryType(), // retain from localStorage or default
+      albumIds: new SvelteSet(),
       personIds: new SvelteSet(),
       tagIds: new SvelteSet(),
       location: {},
@@ -144,6 +147,7 @@
       visibility: filter.display.isArchive ? AssetVisibility.Archive : undefined,
       isFavorite: filter.display.isFavorite || undefined,
       isNotInAlbum: filter.display.isNotInAlbum || undefined,
+      albumIds: filter.albumIds.size > 0 ? [...filter.albumIds] : undefined,
       personIds: filter.personIds.size > 0 ? [...filter.personIds] : undefined,
       tagIds: filter.tagIds === null ? null : filter.tagIds.size > 0 ? [...filter.tagIds] : undefined,
       type,
@@ -174,6 +178,9 @@
   <ModalBody>
     <form id={formId} autocomplete="off" {onsubmit} {onreset}>
       <div class="flex flex-col gap-5 pb-10" tabindex="-1">
+        <!-- ALBUMS -->
+        <SearchAlbumsSection bind:selectedAlbums={filter.albumIds} />
+
         <!-- PEOPLE -->
         <SearchPeopleSection bind:selectedPeople={filter.personIds} />
 

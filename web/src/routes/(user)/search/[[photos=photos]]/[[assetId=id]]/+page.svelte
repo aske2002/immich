@@ -34,6 +34,7 @@
   import {
     type AlbumResponseDto,
     type AssetResponseDto,
+    getAlbumInfo,
     getPerson,
     getTagById,
     type MetadataSearchDto,
@@ -181,6 +182,7 @@
       make: $t('camera_brand'),
       model: $t('camera_model'),
       lensModel: $t('lens_model'),
+      albumIds: $t('albums'),
       personIds: $t('people'),
       tagIds: $t('tags'),
       originalFileName: $t('file_name_text'),
@@ -205,6 +207,17 @@
     );
 
     return personNames.join(', ');
+  }
+
+  async function getAlbumNames(albumIds: string[]) {
+    const albumNames = await Promise.all(
+      albumIds.map(async (albumId) => {
+        const album = await getAlbumInfo({ id: albumId });
+        return album.albumName;
+      }),
+    );
+
+    return albumNames.join(', ');
   }
 
   async function getTagNames(tagIds: string[] | null) {
@@ -252,7 +265,47 @@
           class="flex items-center justify-center bg-immich-primary py-2 px-4 text-white dark:text-black dark:bg-immich-dark-primary
           {value === true ? 'rounded-full' : 'rounded-s-full'}"
         >
-          {getHumanReadableSearchKey(searchKey as keyof SearchTerms)}
+          <span
+            class="shrink-0 rounded-full bg-primary px-3 py-1.5 font-medium text-light dark:bg-immich-dark-primary dark:text-immich-dark-gray"
+          >
+            {getHumanReadableSearchKey(searchKey as keyof SearchTerms)}
+          </span>
+
+          {#if value !== true}
+            <span class="max-w-[min(36rem,55vw)] min-w-0 truncate px-3 py-1.5 text-immich-fg dark:text-immich-dark-fg">
+              {#if (searchKey === 'takenAfter' || searchKey === 'takenBefore') && typeof value === 'string'}
+                {getHumanReadableDate(value)}
+              {:else if searchKey === 'personIds' && Array.isArray(value)}
+                {#await getPersonName(value) then personName}
+                  {personName}
+                {/await}
+              {:else if searchKey === 'albumIds' && Array.isArray(value)}
+                {#await getAlbumNames(value) then albumNames}
+                  {albumNames}
+                {/await}
+              {:else if searchKey === 'tagIds' && (Array.isArray(value) || value === null)}
+                {#await getTagNames(value) then tagNames}
+                  {tagNames}
+                {/await}
+              {:else if searchKey === 'rating'}
+                {$t('rating_count', { values: { count: value ?? 0 } })}
+              {:else if value === null || value === ''}
+                {$t('unknown')}
+              {:else}
+                {value}
+              {/if}
+            </span>
+          {/if}
+
+          <button
+            type="button"
+            class="ms-0.5 flex size-7 shrink-0 items-center justify-center rounded-full text-primary outline-offset-2 outline-immich-primary transition-colors hover:bg-primary/15 focus-visible:outline-2 dark:text-immich-dark-primary dark:outline-immich-dark-primary dark:hover:bg-immich-dark-primary/20"
+            aria-label={$t('remove_filter')}
+            title={$t('remove_filter')}
+            onclick={() => removeFilter(searchKey)}
+          >
+            <Icon icon={mdiClose} size="14" />
+          </button>
         </div>
 
         {#if value !== true}

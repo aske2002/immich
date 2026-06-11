@@ -80,7 +80,8 @@ export type SearchLocationFilter = {
 export type SearchFilter = {
   query: string;
   ocr?: string;
-  queryType: 'smart' | 'metadata' | 'description' | 'ocr';
+  queryType: 'smart' | 'metadata' | 'description' | 'fullPath' | 'ocr';
+  albumIds: SvelteSet<string>;
   personIds: SvelteSet<string>;
   tagIds: SvelteSet<string> | null;
   location: SearchLocationFilter;
