@@ -34,6 +34,7 @@
   import {
     type AlbumResponseDto,
     type AssetResponseDto,
+    getAlbumInfo,
     getPerson,
     getTagById,
     type MetadataSearchDto,
@@ -182,6 +183,7 @@
       make: $t('camera_brand'),
       model: $t('camera_model'),
       lensModel: $t('lens_model'),
+      albumIds: $t('albums'),
       personIds: $t('people'),
       tagIds: $t('tags'),
       originalFileName: $t('file_name_text'),
@@ -207,6 +209,17 @@
     );
 
     return personNames.join(', ');
+  }
+
+  async function getAlbumNames(albumIds: string[]) {
+    const albumNames = await Promise.all(
+      albumIds.map(async (albumId) => {
+        const album = await getAlbumInfo({ id: albumId });
+        return album.albumName;
+      }),
+    );
+
+    return albumNames.join(', ');
   }
 
   async function getTagNames(tagIds: string[] | null) {
@@ -268,6 +281,10 @@
               {:else if searchKey === 'personIds' && Array.isArray(value)}
                 {#await getPersonName(value) then personName}
                   {personName}
+                {/await}
+              {:else if searchKey === 'albumIds' && Array.isArray(value)}
+                {#await getAlbumNames(value) then albumNames}
+                  {albumNames}
                 {/await}
               {:else if searchKey === 'tagIds' && (Array.isArray(value) || value === null)}
                 {#await getTagNames(value) then tagNames}
