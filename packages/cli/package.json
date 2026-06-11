@@ -1,6 +1,6 @@
 {
   "name": "@immich/cli",
-  "version": "2.7.5",
+  "version": "2.7.5-patch.1",
   "description": "Command Line Interface (CLI) for Immich",
   "repository": {
     "type": "git",
