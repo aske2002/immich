@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Combobox, { type ComboBoxOption } from '$lib/components/shared-components/Combobox.svelte';
+  import Combobox, { type ComboBoxOption } from '$lib/components/shared-components/combobox.svelte';
   import { getAllAlbums, type AlbumResponseDto } from '@immich/sdk';
-  import { Text, Icon } from '@immich/ui';
+  import { Icon, Text } from '@immich/ui';
   import { mdiClose } from '@mdi/js';
   import { onMount } from 'svelte';
   import { t } from 'svelte-i18n';
